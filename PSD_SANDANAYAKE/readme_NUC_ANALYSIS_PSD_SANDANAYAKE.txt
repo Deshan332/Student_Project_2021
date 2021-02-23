@@ -9,14 +9,15 @@ For the program to function correctly,
 	- The data files must be of no extension or .txt
 	- The data files must be located in the same directory as the program
 To run it,
-	- enter the command "root -l" into the terminal (all commands must be entered without quotes 		  (")).
+	- enter the command "root -l" into the terminal (all commands must be entered without quotes (")).
 	- when root has started, type ".x NUC_ANALYSIS.C"
 
 ******* Start of phase I: LEVEL DENSITY plots *******
 
 	- Now the user will see a question "Input the STARTING STRING of the files you need to analyze
 	  (IN UPPERCASE. For this project, please enter either TE128 or SC44):". The input MUST BE
-	  in uppercase in this project because both files either start with "TE128" or "SC44" 		  concerning level densities.
+	  in uppercase in this project because both files either start with "TE128" or "SC44" 
+	  concerning level densities.
 	- Then it requires the user to provide the bin width (which is a sensible value of course). In
 	  this project, it is kept at 0.2MeV as a standard.
 	- Then it asks the user "Do you wish to make plots specific in J for level density (1 if YES, 
@@ -25,7 +26,9 @@ To run it,
 	  Keep hitting ENTER on the active canvas until it reveals the Jmax values for either parities
 	  for the selected nucleus. This serves as a reference of limits of J for which the user will
 	  make the next choice.
-	- If the user choice was "1", he will be asked how many J_i values does he wish to analyze, 	      and for the given no. of choices, the program will ask J_i and parity one after the other. 		  For parity, he must enter "1" for + parity and "-1" for - parity.
+	- If the user choice was "1", he will be asked how many J_i values does he wish to analyze,
+	  and for the given no. of choices, the program will ask J_i and parity one after the other.
+	  For parity, he must enter "1" for + parity and "-1" for - parity.
 	- Following the previous print, as he keeps hitting ENTER, the level density plots will be
 	  revealed. All relevant data files for all histograms will be automatically saved in the 
 	  directory along with the plots in PDF format.
@@ -41,7 +44,8 @@ To run it,
 	- Then he will be asked if he wishes to make selections on J_i for which again he must answer
 	  "1" if YES, "0" if NO. If YES, he will be asked for the no. of J_i and also the list of J_i.
 	- At this point a plot will be displayed on the canvas again. Keep pressing ENTER to reveal 
-	  all the plots as per the user's choices. Again, all relevant data files will be stored in 		  the directory along with a PDF file with the plot.
+	  all the plots as per the user's choices. Again, all relevant data files will be stored in 		  
+	  the directory along with a PDF file with the plot.
 
 ******* Start of phase III: nuclear strength plots *******
 
