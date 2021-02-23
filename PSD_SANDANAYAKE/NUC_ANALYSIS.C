@@ -479,11 +479,9 @@ void NUC_ANALYSIS()
             Exc = Ei - E_refp;
             bin = fpcount->Fill(Exc);//DUMMY HISTOGRAMS TO EXTRACT BIN INDEX CORRESPONDING TO Exc
             bin1 = ftp->Fill(abs(Egamma));//DUMMY HISTOGRAMS TO EXTRACT BIN INDEX CORRESPONDING TO Egamma
-            if(Egamma>0)         {uv = fxlp-> Fill(Egamma, 0.00000001154*barrp[bin][Ji/2][bin1]*rho_plot_p_arr[Ji/2]->GetBinContent(bin)/countp[bin][Ji/2][bin1]); ++cbinp[uv];  }
-            else if(Egamma<0)    {uv = fxlp-> Fill(abs(Egamma), 0.00000001154*barrp[bin][Ji/2][bin1]*rho_plot_p_arr[Ji/2]->GetBinContent(bin)/countp[bin][Ji/2][bin1]); ++cbinp[uv]; }
+            uv = fxlp-> Fill(abs(Egamma), 0.00000001154*barrp[bin][Ji/2][bin1]*rho_plot_p_arr[Ji/2]->GetBinContent(bin)/countp[bin][Ji/2][bin1]); ++cbinp[uv];
         }
         readpos.close();
-
         ofstream pp ("te128pos_m1_f.txt");//print to data file, + parity
         pp<<"Bin no.    "<<"Bin center    "<<"value"<<"  No. of counts"<<endl;
         for(int e=0; e<=fxlp->GetXaxis()->GetNbins(); ++e)
@@ -493,7 +491,6 @@ void NUC_ANALYSIS()
             pp<<e<<"          "<<fxlp->GetBinCenter(e)<<"     "<<fxlp->GetBinContent(e)<<"   "<<cbinp[e]<<endl;
         }
         pp.close();
-        
         readneg.open("te128neg_m1.txt");
         while (readneg >> Ji >> Jf >> Ei >> Egamma >> Bif >> Bfi)
         {
