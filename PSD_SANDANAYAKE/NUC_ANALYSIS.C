@@ -22,7 +22,6 @@ int fixer(TString filename)
     TString filename_fixed    = filename + TString("_fixed.txt");
     TString filename_new      = filename + TString(".txt");
     ifstream read_filename;     read_filename.open(filename); 
-        //if (!read_filename)     {cout <<"The file "<<filename<<" does not exist!"<<endl;}
     rename(filename,filename_new);
     ofstream ff (filename_fixed);
     //fix to fill the gap at 2*J=<<_>>X and N=  <<_>>X, and make new files
@@ -94,11 +93,12 @@ TH1F* Bplotter(TString name, double binwidth,TString sgn, int cutstat,  double L
     //initializations
     TString s = ToLower(name);
     TString filename_new,filename1,filename2, filename_new2;
+    TString tag, tail;
     //rename data files and also have a .txt extension
     if(name == TString("TE128"))
     {
-        if(sgn==TString("pos")){filename1 = s + TString("pos_m1");  filename_new = s + TString("pos_m1.txt");   filename2 = s + TString("neg_m1");  filename_new2 = s + TString("neg_m1.txt");}
-        if(sgn==TString("neg")){filename1 = s + TString("neg_m1");  filename_new = s + TString("neg_m1.txt");   filename1 = s + TString("pos_m1");  filename_new2 = s + TString("pos_m1.txt");}
+        if(sgn==TString("pos")){filename1 = s + TString("pos_m1");  filename_new = s + TString("pos_m1.txt");   filename2 = s + TString("neg_m1");  filename_new2 = s + TString("neg_m1.txt");  tail=TString(" for (+) parity");}
+        if(sgn==TString("neg")){filename1 = s + TString("neg_m1");  filename_new = s + TString("neg_m1.txt");   filename1 = s + TString("pos_m1");  filename_new2 = s + TString("pos_m1.txt");  tail=TString(" for (-) parity");}
         rename(filename1,filename_new);
         rename(filename2,filename_new2);
     }
@@ -112,7 +112,6 @@ TH1F* Bplotter(TString name, double binwidth,TString sgn, int cutstat,  double L
     read.open(filename_new);  
     int Ji,Jf,c=0;
     double Ei,Egamma,Bif, Bfi,B_sum,Egamma_max=0;
-    TString tag, tail;
     //read spectrum file to set the range for histograms
     while(read >> Ji >> Jf >> Ei >> Egamma >> Bif >> Bfi)
     {
@@ -122,7 +121,7 @@ TH1F* Bplotter(TString name, double binwidth,TString sgn, int cutstat,  double L
     Egamma_max = ceil(Egamma_max); //upper limit for histogram
     int nbins;  
     nbins = Egamma_max/binwidth; //no.of bins
-    if(name == TString("TE128")){tag = TString("(M1)"); tail = TString(" for different parities");}//strings to set histogram names
+    if(name == TString("TE128")){tag = TString("(M1)");}//strings to set histogram names
     if(name == TString("SC44")){tag = TString("(E1)");  tail = TString("");}
     TH1F* bm1 = new TH1F(filename_new + sgn + TString(Form("%d",J_i)) + TString(Form("%d",Ji_stat)), TString("Graph of B") + tag + TString(" vs. Gamma de-excitation energy for ") + name + tail, nbins, 0 , Egamma_max ); // the histogram
     gStyle->SetOptStat(kFALSE); 
@@ -291,15 +290,9 @@ void NUC_ANALYSIS()
     rho_tot->SetLineColor(kGreen);
     rho_tot->SetLineWidth(1);
     rho_tot->GetXaxis()->SetRangeUser(0,10);
-    rho_tot->Draw("HIST,SAME");
-    c1->Update();
-	c1->WaitPrimitive(); 
-    rho_plot_1->Draw("HIST,SAME");
-    c1->Update();
-	c1->WaitPrimitive(); 
+    rho_tot->Draw("HIST,SAME"); 
+    rho_plot_1->Draw("HIST,SAME"); 
     rho_plot_2->Draw("HIST,SAME");
-    c1->Update();
-	c1->WaitPrimitive();
     //selections on J_i
     int J_max1=0, J_max2=0;
     ifstream rr;
@@ -343,8 +336,6 @@ void NUC_ANALYSIS()
                 if(parity[q] == 1)          
                 {
                     rho_plot_p_arr[q] ->SetLineColor(kWhite + cc );
-                    c1->Update();
-                    c1->WaitPrimitive();
                     rho_plot_p_arr[q] ->Draw("HIST,SAME");
                     ftag = filename1;  
                     ptag = TString("+");
@@ -354,8 +345,6 @@ void NUC_ANALYSIS()
                 if(parity[q] == -1)    
                 {
                     rho_plot_n_arr[q] ->SetLineColor(kWhite + cc );
-                    c1->Update();
-                    c1->WaitPrimitive();
                     rho_plot_n_arr[q] ->Draw("HIST,SAME");
                     ftag = filename2;  
                     ptag = TString("-");
@@ -371,8 +360,6 @@ void NUC_ANALYSIS()
     legend->AddEntry(rho_tot,"combined","l");
     legend->SetBorderSize(0);
     legend->Draw();
-    c1->Update();
-	c1->WaitPrimitive();
     c1-> SaveAs(TString("level_density_") + name + TString(".pdf"));
     int cutstat, cutnum=0, Jistat, J_inum=0, pstat;
     int J_i[10];
@@ -435,9 +422,6 @@ void NUC_ANALYSIS()
         BM1 ->SetMaximum(0.1);
         BM1 ->Draw("HIST");
         nlegend->AddEntry(BM1,"<B(M1,#pi^{" + sgn + "})> : uncut","l"); 
-        c1->Update();
-	    c1->WaitPrimitive();
-        
         for(int m=0; m<countnum; ++m)//cuts in J and E_exc printed or not as per user choice
         {
             for(int s=0; s<Jcnum; ++s)
@@ -446,8 +430,6 @@ void NUC_ANALYSIS()
                 TH1F *BM = Bplotter(name,BW,ptag,cutstat,LL[m],UL[m],Jistat,J_i[s]);
                 BM ->SetLineColor(kWhite + colors[colorcount]);
                 BM ->Draw("HIST,SAME");
-                c1->Update();
-                c1->WaitPrimitive(); 
                 if(cutnum==0)   {if(Jistat==1) {nlegend->AddEntry(BM,TString("<B(M1,#pi^{" + sgn + "})> : All E_{EXC}, J_{i} = ") + TString(Form("%d",J_i[s])),"l");}} 
                 else           {
                                     if(Jistat==1)   {nlegend->AddEntry(BM,TString("<B(M1,#pi^{" + sgn + "})> : ") + Form("%.1f",LL[m]) + TString("-") + Form("%.1f",UL[m]) + TString("MeV, J_{i} = ") + TString(Form("%d",J_i[s])),"l");}
@@ -459,17 +441,13 @@ void NUC_ANALYSIS()
         nlegend->SetBorderSize(0);
         nlegend->Draw();
         c1->Update();
-	    c1->WaitPrimitive();
-        c1->Update();
-	    c1->WaitPrimitive();
-        c1->Update();
-	    c1->WaitPrimitive();
+        c1->WaitPrimitive();
         c1-> SaveAs("B(M1)_Te128.pdf");
         cout <<"******* Start of phase III: nuclear strength plots *******"<<endl;
         //creating fxl plots
-        TH1F* fxlp = new TH1F("fxlp", TString("Graph of nuclear strength function vs. E_{#gamma} for B(M1) transitions of Te128"), 5/BW, 0, 5);//fxl for + parity (5 set as limit because SM valid only below ~5MeV)
-        TH1F* fxln = new TH1F("fxln", TString("Graph of nuclear strength function vs. E_{#gamma} for B(M1) transitions of Te128"), 5/BW, 0, 5);//fxl for + parity
-        TH1F* fxl = new TH1F("fxl", TString("Graph of nuclear strength function vs. E_{#gamma} for B(M1) transitions of Te128"), 5/BW, 0, 5);//fxl combined
+        TH1F* fxlp = new TH1F("fxlp", TString("Graph of nuclear strength function vs. E_{#gamma} for B(M1) transitions of Te128"), 10/BW, 0, 10);//fxl for + parity 
+        TH1F* fxln = new TH1F("fxln", TString("Graph of nuclear strength function vs. E_{#gamma} for B(M1) transitions of Te128"), 10/BW, 0, 10);//fxl for + parity
+        TH1F* fxl = new TH1F("fxl", TString("Graph of nuclear strength function vs. E_{#gamma} for B(M1) transitions of Te128"), 10/BW, 0, 10);//fxl combined
         TH1F* ftp = new TH1F("testp", "testp", 5/BW, 0, 5); //dummy histogram to find bin index for Egamma, + parity
         TH1F* ftn = new TH1F("testn", "testn", 5/BW, 0, 5); //dummy histogram to find bin index for Egamma, - parity
         TH1F* fpcount = new TH1F("fpcount", name, (bin_max)/BW, 0 , bin_max); //dummy histogram to find bin index for E_exc, + parity
@@ -524,8 +502,7 @@ void NUC_ANALYSIS()
             bin1 = ftn->Fill(abs(Egamma));//DUMMY HISTOGRAMS TO EXTRACT BIN INDEX CORRESPONDING TO Egamma
             ++countn[bin][Ji/2][bin1];//store no. of B values of a given combo of (Exc,Ji,Egamma)
             if(Egamma>0){barrn[bin][Ji/2][bin1]=barrn[bin][Ji/2][bin1]+Bif;}//store total B of a given combo of (Exc,Ji,Egamma)
-            if(Egamma<0){barrn[bin][Ji/2][bin1]=barrn[bin][Ji/2][bin1]+Bfi;}
-                
+            if(Egamma<0){barrn[bin][Ji/2][bin1]=barrn[bin][Ji/2][bin1]+Bfi;} 
         }
         readneg.close();
         readneg.open("te128neg_m1.txt"); //gnd state reference is E_refp
@@ -535,8 +512,7 @@ void NUC_ANALYSIS()
             Exc = Ei - E_refp;
             bin = fncount->Fill(Exc);
             bin1 = ftn->Fill(abs(Egamma));
-            if(Egamma>0)        {uv = fxln-> Fill(Egamma, 0.00000001154*barrn[bin][Ji/2][bin1]*rho_plot_n_arr[Ji/2]->GetBinContent(bin)/countn[bin][Ji/2][bin1]); ++cbinn[uv];} //calculation. the constant is the conversion factor.
-            else if(Egamma<0)   {uv = fxln-> Fill(abs(Egamma), 0.00000001154*barrn[bin][Ji/2][bin1]*rho_plot_n_arr[Ji/2]->GetBinContent(bin)/countn[bin][Ji/2][bin1]); ++cbinn[uv];}
+            uv = fxln-> Fill(abs(Egamma), 0.00000001154*barrn[bin][Ji/2][bin1]*rho_plot_n_arr[Ji/2]->GetBinContent(bin)/countn[bin][Ji/2][bin1]); ++cbinn[uv]; //calculation. the constant is the conversion factor.
         }
         readneg.close();
         ofstream nn ("te128neg_m1_f.txt");
@@ -548,7 +524,6 @@ void NUC_ANALYSIS()
             nn<<f<<"          "<<fxln->GetBinCenter(f)<<"     "<<fxln->GetBinContent(f)<<"   "<<cbinn[f]<<endl; //print to data file, + parity
         }
         nn.close();
-
         ofstream tt ("te128_m1_f_tot.txt");
         tt<<"Bin no.    "<<"Bin center    "<<"value"<<endl;
         for(int g=0; g<fxl->GetXaxis()->GetNbins(); ++g)//extract values from either parities, compute the total fxl
@@ -571,15 +546,12 @@ void NUC_ANALYSIS()
         fxln->SetLineWidth(1);
         fxl->SetLineColor(kGreen);
         fxl->SetLineWidth(1);
+        fxlp ->GetXaxis()->SetRangeUser(0,5);
         fxlp ->Draw("HIST");
-        c1->Update();
-	    c1->WaitPrimitive();
+        fxln ->GetXaxis()->SetRangeUser(0,5);
         fxln ->Draw("HIST, same");
-        c1->Update();
-	    c1->WaitPrimitive();
+        fxl ->GetXaxis()->SetRangeUser(0,5);
         fxl ->Draw("HIST, same");
-        c1->Update();
-	    c1->WaitPrimitive();
         flegend->Draw();
         c1-> SaveAs("f(M1)_Te128.pdf");
     }
@@ -591,8 +563,6 @@ void NUC_ANALYSIS()
         BE1 ->GetXaxis()->SetRangeUser(0,10);
         BE1 ->Draw("HIST");
         nlegend->AddEntry(BE1,"<B(E1)> : Uncut","l");
-        c1->Update();
-	    c1->WaitPrimitive();
         TString BE, BE1_ = "BE1_";
         for(int m=0; m<countnum; ++m)//make histograms by cuts in J and E_exc depending on user choice
         {
@@ -601,9 +571,7 @@ void NUC_ANALYSIS()
                 BE = BE1_ + Form("%d",m) + Form("%d",s);
                 TH1F *BE = Bplotter(name,BW,"",cutstat,LL[m],UL[m],Jistat,J_i[s]);
                 BE ->SetLineColor(kWhite + colors[colorcount]);
-                BE ->Draw("HIST,SAME");
-                c1->Update();
-                c1->WaitPrimitive(); 
+                BE ->Draw("HIST,SAME"); 
                 if(cutnum==0)   {if(Jistat==1)  {nlegend->AddEntry(BE,TString("<B(E1)> : All E_{EXC}, J_{i} = ") + TString(Form("%d",J_i[s])),"l");}} 
                 else            {
                                     if(Jistat==1)   {nlegend->AddEntry(BE,TString("<B(E1)> : ") + Form("%.1f",LL[m]) + TString("-") + Form("%.1f",UL[m]) + TString("MeV, J_{i} = ") + TString(Form("%d",J_i[s])),"l");}
@@ -613,10 +581,12 @@ void NUC_ANALYSIS()
             }
         }
         nlegend->Draw();
-        c1-> SaveAs("B(E1)_Sc44.pdf");
+        c1->Update();
+        c1->WaitPrimitive();
+        c1-> SaveAs("B(E1)_Sc44.pdf");//SAVE PDF
         cout <<"******* Start of phase III: nuclear strength plots *******"<<endl;
-        TH1F* fxls = new TH1F("fxlps", TString("Graph of nuclear strength function vs. E_{#gamma} for B(E1) transitions of Sc44"), 10/BW, 0, 10);
-        TH1F* fpcounts = new TH1F("fpcounts", name, (bin_max)/BW, 0 , bin_max);
+        TH1F* fxls = new TH1F("fxlps", TString("Graph of nuclear strength function vs. E_{#gamma} for B(E1) transitions of Sc44"), 12/BW, 0, 12);//HISTOGRAM STORING FXL. LIMITED TO 12 BECAUSE 10 IS WHAT WE NEED
+        TH1F* fpcounts = new TH1F("fpcounts", name, (bin_max)/BW, 0 , bin_max);//DUMMY HISTOGRAM
         TH1F* fts = new TH1F("fts", "fts", 30/BW, 0, 30);
         ifstream readposs;
         double Epmins=0, Excs=0, Eis, Egammas, Bifs, Bfis;
@@ -624,8 +594,7 @@ void NUC_ANALYSIS()
         int counts[120][max(J_max1, J_max2)][120];
         double barrs[120][max(J_max1, J_max2)][120];
         for(int c=0; c<120; ++c){cbinps[c]=0;}
-        
-        readposs.open("sc44e1.txt");
+        readposs.open("sc44e1.txt"); //OPEN SPECTRUM FILE
         while (readposs >> Jis >> Jfs >> Eis >> Egammas >> Bifs >> Bfis)
         {
             Excs = Eis - E_refp; 
@@ -633,8 +602,7 @@ void NUC_ANALYSIS()
             bin1s = fts->Fill(abs(Egammas));//DUMMY HISTOGRAMS TO EXTRACT BIN INDEX CORRESPONDING TO Egamma
             ++counts[bins][Jis/2][bin1s];//store no. of B values of a given combo of (Exc,Ji,Egamma)
             if( (Egammas>0) ){barrs[bins][Jis/2][bin1s]=barrs[bins][Jis/2][bin1s]+Bifs;}//store total B of a given combo of (Exc,Ji,Egamma)
-            if( (Egammas<0) ){barrs[bins][Jis/2][bin1s]=barrs[bins][Jis/2][bin1s]+Bfis;}
-                
+            if( (Egammas<0) ){barrs[bins][Jis/2][bin1s]=barrs[bins][Jis/2][bin1s]+Bfis;}  
         }
         readposs.close();
         readposs.open("sc44e1.txt");
@@ -643,8 +611,7 @@ void NUC_ANALYSIS()
             Excs = Eis - E_refp;
             bins = fpcounts->Fill(Excs);
             bin1s = fts->Fill(abs(Egammas));
-            if(Egammas>0)       {uvs = fxls-> Fill(Egammas, 0.00000106*barrs[bins][Jis/2][bin1s]*rho_tot->GetBinContent(bins)/counts[bins][Jis/2][bin1s]); ++cbinps[uvs];}//calculation, same as in Te128
-            else if(Egammas<0)   {uvs = fxls-> Fill(abs(Egammas), 0.00000106*barrs[bins][Jis/2][bin1s]*rho_tot->GetBinContent(bins)/counts[bins][Jis/2][bin1s]); ++cbinps[uvs];}
+            uvs = fxls-> Fill(abs(Egammas), 0.00000106*barrs[bins][Jis/2][bin1s]*rho_tot->GetBinContent(bins)/counts[bins][Jis/2][bin1s]); ++cbinps[uvs];   //calculation, same as in Te128
         }
         readposs.close();
         ofstream pps ("sc44e1_f.txt");
@@ -656,22 +623,16 @@ void NUC_ANALYSIS()
             pps<<es<<"          "<<fxls->GetBinCenter(es)<<"     "<<fxls->GetBinContent(es)<<"     "<<cbinps[es]<<endl;
         }
         pps.close();
-        
         auto fslegend = new TLegend(0.4,0.2,0.4,0.2);
         fslegend->AddEntry(fxls,"f_{E1}","l"); 
         fxls->GetXaxis()->SetTitle("E_{#gamma} (MeV)"); 
         fxls->GetYaxis()->SetTitle("f_{E1} (MeV^{-3})");
         fxls->SetLineColor(kRed);
         fxls->SetLineWidth(1);
-        c1->Update();
-	    c1->WaitPrimitive();
+        fxls ->GetXaxis()->SetRangeUser(0,10);
         fxls ->Draw("HIST");
-        c1->Update();
-	    c1->WaitPrimitive();
         fslegend->SetBorderSize(0);
         fslegend->Draw();
         c1-> SaveAs("f(E1)_Sc44.pdf");
-
     }
-
 }
